@@ -1,0 +1,4 @@
+Model: distilbert-base-uncased
+Epochs: 3
+Final Validation Accuracy: 0.8300
+Final Validation F1: 0.8298

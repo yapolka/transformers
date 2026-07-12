@@ -1,0 +1,12 @@
+Baseline (no fine-tuning) results
+Model: distilbert-base-uncased
+Macro F1: 0.7947
+
+              precision    recall  f1-score   support
+
+           0       0.79      0.81      0.80       102
+           1       0.80      0.78      0.79        98
+
+    accuracy                           0.80       200
+   macro avg       0.80      0.79      0.79       200
+weighted avg       0.80      0.80      0.79       200
