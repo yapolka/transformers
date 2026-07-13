@@ -14,7 +14,9 @@
   что такое `[CLS]`/`[SEP]`/`[PAD]`, как работает subword-разбиение.
 - **День 2** - эмбеддинги. Прогнала текст через `AutoModel`, вытащила
   hidden states и CLS-эмбеддинг, посчитала косинусное сходство между текстами.
-- **День 3** - attention.
+- **День 3** - attention. Вытащила attention-веса (`output_attentions=True`) и
+  нарисовала heatmap'ы: как внимание распределяется между токенами на разных
+  слоях и в разных головах.
 - **День 4** - baseline без дообучения: беру эмбеддинги из предобученного
   DistilBERT и обучаю поверх них обычную LogisticRegression.
 - **День 5** - fine-tuning: дообучаю саму модель (`AutoModelForSequenceClassification`)
@@ -28,16 +30,10 @@ Fine-tuning дал прирост над baseline:
 
 | Модель | F1 (macro) | Accuracy |
 |---|---|---|
-| Baseline (эмбеддинги + LogReg) | 0.7936 | 0.7936 |
-| Fine-tuned | 0.8229 | 0.8238 |
+| Baseline (эмбеддинги + LogReg) | 0.7947 | 0.7950 |
+| Fine-tuned | 0.8097 | 0.8100 |
 
-Улучшение F1 - около **3.7%**.
-
-Из анализа ошибок: модель чаще всего спотыкается не
-на простой лексике вроде "good"/"bad", а на более коварных вещах - сарказме
-(например, отзыв на "Facing the Giants", где позитивные слова использованы
-издевательски), на отзывах, где тональность меняется по ходу текста, и на
-длинных рецензиях, где вывод рецензента спрятан где-то в середине или в конце.
+Улучшение F1 - около **1.9%**.
 
 ## Структура репозитория
 
@@ -46,20 +42,21 @@ transformers/
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
-├── src/                           - код по дням
+├── src/                           - код по дням, переиспользуемые функции
 │   ├── day1_tokenization.py
 │   ├── day2_embeddings.py
-│   ├── day3_attention.py         
+│   ├── day3_attention.py
 │   ├── day4_baseline.py
 │   ├── day5_finetuning.py
 │   ├── day6_comparison.py
 │   └── day7_error_analysis.py
 ├── notebooks/
 │   └── transformer.ipynb         - черновик, где всё изначально писалось и тестировалось
+├── attention_plots/              - heatmap'ы attention по слоям и головам (день 3)
 ├── docs/
-│   └── day01_notes.md            - конспект/выводы по архитектуре трансформеров
+│   └── error_observations.md     - ручной разбор паттернов ошибок (день 7)
 ├── app.py                        - Gradio-демо
-├── fine_tuned_model/             - веса дообученной модели 
+├── fine_tuned_model/             - веса дообученной модели (хранится через Git LFS)
 ├── baseline_model.pkl
 ├── predictions_fine_tuned.csv
 ├── confusion_matrix_finetuned.png
@@ -80,10 +77,11 @@ pip install -r requirements.txt
 
 python src/day1_tokenization.py
 python src/day2_embeddings.py
-python src/day4_baseline.py       # - baseline_model.pkl, baseline_results.txt
-python src/day5_finetuning.py     # - fine_tuned_model/, fine_tuned_results.txt
-python src/day6_comparison.py     # - predictions_fine_tuned.csv, comparison_results.txt
-python src/day7_error_analysis.py # - error_analysis.txt
+python src/day3_attention.py      # → attention_plots/
+python src/day4_baseline.py       # → baseline_model.pkl, baseline_results.txt
+python src/day5_finetuning.py     # → fine_tuned_model/, fine_tuned_results.txt
+python src/day6_comparison.py     # → predictions_fine_tuned.csv, comparison_results.txt
+python src/day7_error_analysis.py # → error_analysis.txt (статистика + примеры)
 ```
 
 ## Демо
@@ -94,6 +92,7 @@ python app.py
 
 Откроется на `http://127.0.0.1:7860` - можно ввести любой текст на английском
 и посмотреть, что скажет модель.
+
 
 ## Что понадобится
 
